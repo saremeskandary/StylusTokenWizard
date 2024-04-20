@@ -3,11 +3,13 @@ import './styles/global.css';
 import type {} from 'svelte';
 import App from './App.svelte';
 import CairoApp from './cairo/App.svelte';
+import StylusApp from './stylus/App.svelte';
 import { postMessage } from './post-message';
 import UnsupportedVersion from './UnsupportedVersion.svelte';
 import semver from 'semver';
 import { compatibleContractsSemver as compatibleSolidityContractsSemver } from '@openzeppelin/wizard';
 import { compatibleContractsSemver as compatibleCairoContractsSemver } from '@openzeppelin/wizard-cairo';
+import { compatibleContractsSemver as compatibleStylusContractsSemver } from '@openzeppelin/wizard-stylus';
 
 function postResize() {
   const { height } = document.documentElement.getBoundingClientRect();
@@ -25,7 +27,9 @@ const initialTab = params.get('tab') ?? undefined;
 const lang = params.get('lang') ?? undefined;
 const requestedVersion = params.get('version') ?? undefined;
 
-let compatibleVersionSemver = lang === 'cairo' ? compatibleCairoContractsSemver : compatibleSolidityContractsSemver;
+let compatibleVersionSemver = lang === 'cairo' ? 
+      compatibleCairoContractsSemver : lang === 'stylus' ? 
+      compatibleStylusContractsSemver : compatibleSolidityContractsSemver;
 
 let app;
 if (requestedVersion && !semver.satisfies(requestedVersion, compatibleVersionSemver)) {
@@ -33,6 +37,8 @@ if (requestedVersion && !semver.satisfies(requestedVersion, compatibleVersionSem
   app = new UnsupportedVersion({ target: document.body, props: { requestedVersion, compatibleVersionSemver }});
 } else if (lang === 'cairo') {
   app = new CairoApp({ target: document.body, props: { initialTab } });
+} else if (lang === 'stylus') {
+  app = new StylusApp({ target: document.body, props: { initialTab } });
 } else {
   app = new App({ target: document.body, props: { initialTab } });
 }
